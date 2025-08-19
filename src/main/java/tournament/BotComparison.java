@@ -11,21 +11,21 @@ import implementations.SimpleStrategicBot;
 public class BotComparison {
 
     public static void main(String[] args) {
-        Connect4Bot randomBot = new RandomConnect4Bot();
-        Connect4Bot strategicBot = new SimpleStrategicBot();
+        Connect4Bot bot1 = new RandomConnect4Bot();
+        Connect4Bot bot2 = new SimpleStrategicBot();
 
-        System.out.println("Bot Comparison: RandomBot vs SimpleStrategicBot");
+        System.out.println("Bot Comparison:");
         System.out.println("=" + "=".repeat(50));
 
         // Run a single game to see the gameplay
         System.out.println("\n🎮 Sample Game:");
-        Connect4Game sampleGame = new Connect4Game(strategicBot, randomBot);
+        Connect4Game sampleGame = new Connect4Game(bot2, bot1);
         Connect4Game.GameResult sampleResult = sampleGame.playGame();
         System.out.println(sampleResult);
 
         // Run multiple games to see win statistics
         System.out.println("\n📊 Running 1000 games for statistics...");
-        runMultipleGames(strategicBot, randomBot, 1000);
+        runMultipleGames(bot2, bot1, 1000);
     }
 
     private static void runMultipleGames(Connect4Bot bot1, Connect4Bot bot2, int numGames) {
