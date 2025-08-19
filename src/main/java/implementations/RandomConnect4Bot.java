@@ -1,10 +1,12 @@
-package bots;
+package implementations;
+
+import interfaces.Connect4Bot;
 
 /**
  * A simple Connect 4 bot that makes random valid moves.
  * This serves as an example implementation of the Connect4Bot interface.
  */
-public class RandomConnect4Bot implements bots.Connect4Bot {
+public class RandomConnect4Bot implements Connect4Bot {
 
     private final java.util.Random random = new java.util.Random();
 

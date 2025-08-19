@@ -13,7 +13,7 @@ import java.util.List;
 public class TokenCounter {
 
     public static void main(String[] args) {
-        String botsDirectory = "src/main/java/bots";
+        String botsDirectory = "src/main/java/implementations";
         TokenCounter counter = new TokenCounter();
         counter.analyzeBotsDirectory(botsDirectory);
     }

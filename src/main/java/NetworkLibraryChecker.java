@@ -62,7 +62,7 @@ public class NetworkLibraryChecker {
     );
 
     public static void main(String[] args) {
-        String botsDirectory = "src/main/java/bots";
+        String botsDirectory = "src/main/java/implementations";
         NetworkLibraryChecker checker = new NetworkLibraryChecker();
         checker.analyzeBotsDirectory(botsDirectory);
     }

@@ -1,4 +1,7 @@
-package bots;
+package tournament;
+
+import interfaces.Connect4Bot;
+import implementations.RandomConnect4Bot;
 
 /**
  * Connect 4 game engine that runs a match between two Connect4Bot implementations.

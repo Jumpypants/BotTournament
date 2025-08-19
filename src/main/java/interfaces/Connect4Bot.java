@@ -1,4 +1,4 @@
-package bots;
+package interfaces;
 
 /**
  * Interface for Connect 4 playing bots.
