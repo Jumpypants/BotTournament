@@ -2,10 +2,6 @@ package tournament;
 
 import interfaces.Connect4Bot;
 import tournament.Connect4Game.GameResult;
-
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,101 +25,30 @@ public class Connect4Tournament {
 
     public Connect4Tournament(int numRounds) {
         this.numRounds = numRounds;
-        this.bots = new ArrayList<>();
+        this.bots = BotDiscovery.discoverAllBots();
         this.players = new HashMap<>();
         this.rounds = new ArrayList<>();
 
-        discoverAndLoadBots();
         initializePlayers();
     }
 
     /**
-     * Automatically discovers and loads all Connect4Bot implementations from the implementations package.
+     * Constructor for pre-approved bots (used by RestrictedConnect4Tournament).
      */
-    private void discoverAndLoadBots() {
-        System.out.println("🔍 Discovering bots in implementations package...");
+    public Connect4Tournament(List<Connect4Bot> preApprovedBots, int numRounds) {
+        this.numRounds = numRounds;
+        this.bots = new ArrayList<>(preApprovedBots);
+        this.players = new HashMap<>();
+        this.rounds = new ArrayList<>();
 
-        // First try the fallback method which we know works
-        try {
-            addFallbackBots();
-        } catch (Exception e) {
-            System.err.println("Failed to load known bots: " + e.getMessage());
+        System.out.println("🤖 Using pre-approved bots for tournament:");
+        for (Connect4Bot bot : bots) {
+            System.out.println("   ✅ " + bot.getBotName());
         }
 
-        // Then try dynamic discovery for any additional bots
-        try {
-            // Get the implementations package
-            String packageName = "implementations";
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            String path = packageName.replace('.', '/');
-            URL packageURL = classLoader.getResource(path);
-
-            if (packageURL != null) {
-                File directory = new File(packageURL.getFile());
-                if (directory.exists() && directory.isDirectory()) {
-                    File[] files = directory.listFiles((dir, name) -> name.endsWith(".class"));
-
-                    if (files != null) {
-                        for (File file : files) {
-                            String className = file.getName().replace(".class", "");
-                            try {
-                                Class<?> clazz = Class.forName(packageName + "." + className);
-
-                                // Check if it implements Connect4Bot and is not abstract
-                                if (Connect4Bot.class.isAssignableFrom(clazz) &&
-                                    !clazz.isInterface() &&
-                                    !java.lang.reflect.Modifier.isAbstract(clazz.getModifiers())) {
-
-                                    Connect4Bot bot = (Connect4Bot) clazz.getDeclaredConstructor().newInstance();
-
-                                    // Check if we already have this bot (avoid duplicates)
-                                    boolean alreadyExists = bots.stream()
-                                        .anyMatch(existingBot -> existingBot.getBotName().equals(bot.getBotName()));
-
-                                    if (!alreadyExists) {
-                                        bots.add(bot);
-                                        System.out.println("✅ Discovered bot: " + bot.getBotName());
-                                    }
-                                }
-                            } catch (Exception e) {
-                                // Silently continue - this is expected for classes that don't implement Connect4Bot
-                            }
-                        }
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            System.out.println("ℹ️  Dynamic discovery not available, using known bots only");
-        }
-
-        System.out.println("🤖 Total bots loaded: " + bots.size());
-        if (bots.size() > 0) {
-            System.out.println("📋 Bot roster:");
-            for (Connect4Bot bot : bots) {
-                System.out.println("   • " + bot.getBotName());
-            }
-        }
+        initializePlayers();
     }
 
-    /**
-     * Fallback method to manually add known bot implementations.
-     */
-    private void addFallbackBots() {
-        try {
-            bots.add(new implementations.RandomConnect4Bot());
-            System.out.println("✅ Loaded bot: RandomBot");
-        } catch (Exception e) {
-            System.err.println("Failed to load RandomConnect4Bot: " + e.getMessage());
-        }
-
-        try {
-            bots.add(new implementations.SimpleStrategicBot());
-            System.out.println("✅ Loaded bot: SimpleStrategicBot");
-        } catch (Exception e) {
-            System.err.println("Failed to load SimpleStrategicBot: " + e.getMessage());
-        }
-    }
 
     /**
      * Initialize tournament players from discovered bots.

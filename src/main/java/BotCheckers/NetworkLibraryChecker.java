@@ -1,8 +1,9 @@
+package BotCheckers;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
@@ -141,6 +142,33 @@ public class NetworkLibraryChecker {
         }
     }
 
+    /**
+     * Analyzes a single file and returns true if security violations are found.
+     * This method is used by RestrictedConnect4Tournament.
+     */
+    public boolean analyzeFileForViolations(Path filePath) {
+        try {
+            JavaParser javaParser = new JavaParser();
+            ParseResult<CompilationUnit> parseResult = javaParser.parse(filePath);
+
+            if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
+                CompilationUnit cu = parseResult.getResult().get();
+                AnalysisResult result = analyzeCompilationUnit(cu);
+
+                // Return true if any violations are found
+                return result.hasNetworkAccess || result.hasExternalLibraries;
+
+            } else {
+                // If parsing fails, assume there's a violation
+                return true;
+            }
+
+        } catch (IOException e) {
+            // If file reading fails, assume there's a violation
+            return true;
+        }
+    }
+
     private AnalysisResult analyzeCompilationUnit(CompilationUnit cu) {
         AnalysisResult result = new AnalysisResult();
 
@@ -185,10 +213,19 @@ public class NetworkLibraryChecker {
         public void visit(MethodCallExpr methodCall, AnalysisResult result) {
             super.visit(methodCall, result);
 
-            String methodName = methodCall.getNameAsString();
-            if (NETWORK_METHODS.contains(methodName.toLowerCase())) {
-                result.networkMethodCalls.add(methodName);
-                result.hasNetworkAccess = true;
+            String methodName = methodCall.getNameAsString().toLowerCase();
+            if (NETWORK_METHODS.contains(methodName)) {
+                // To avoid false positives, be more strict about the 'get' method.
+                // Only flag 'get' if it's not a simple variable access, which is common for collections.
+                if (methodName.equals("get")) {
+                    if (methodCall.getScope().isPresent() && !(methodCall.getScope().get().isNameExpr())) {
+                        result.networkMethodCalls.add(methodName);
+                        result.hasNetworkAccess = true;
+                    }
+                } else {
+                    result.networkMethodCalls.add(methodName);
+                    result.hasNetworkAccess = true;
+                }
             }
         }
     }

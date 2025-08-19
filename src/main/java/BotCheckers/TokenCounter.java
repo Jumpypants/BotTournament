@@ -1,3 +1,5 @@
+package BotCheckers;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
@@ -69,6 +71,29 @@ public class TokenCounter {
 
         } catch (IOException e) {
             System.err.println("Error reading file " + filePath.getFileName() + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * Analyzes a single file and returns its token count.
+     * This method is used by RestrictedConnect4Tournament.
+     */
+    public int analyzeFileForTokens(Path filePath) {
+        try {
+            JavaParser javaParser = new JavaParser();
+            ParseResult<CompilationUnit> parseResult = javaParser.parse(filePath);
+
+            if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
+                CompilationUnit cu = parseResult.getResult().get();
+                return countTokens(cu);
+            } else {
+                System.err.println("Failed to parse: " + filePath.getFileName());
+                return Integer.MAX_VALUE; // Return max value to indicate failure
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error reading file " + filePath.getFileName() + ": " + e.getMessage());
+            return Integer.MAX_VALUE; // Return max value to indicate failure
         }
     }
 
