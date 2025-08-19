@@ -34,17 +34,11 @@ public class PlayHuman {
             for (int i = 0; i < availableBots.size(); i++) {
                 System.out.println((i + 1) + ". " + availableBots.get(i).getBotName());
             }
-            System.out.println((availableBots.size() + 1) + ". Quit");
 
             System.out.print("Choose your opponent: ");
 
             try {
                 int choice = Integer.parseInt(scanner.nextLine().trim());
-
-                if (choice == availableBots.size() + 1) {
-                    System.out.println("Thanks for playing!");
-                    return;
-                }
 
                 if (choice < 1 || choice > availableBots.size()) {
                     System.out.println("Invalid choice!");

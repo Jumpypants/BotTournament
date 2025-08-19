@@ -56,3 +56,6 @@ workspace.xml
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# local implementations
+src/main/java/implementations/AlphaBetaConnect4Bot.java
