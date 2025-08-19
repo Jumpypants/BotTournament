@@ -24,8 +24,8 @@ public class BotComparison {
         System.out.println(sampleResult);
 
         // Run multiple games to see win statistics
-        System.out.println("\n📊 Running 10 games for statistics...");
-        runMultipleGames(strategicBot, randomBot, 10);
+        System.out.println("\n📊 Running 1000 games for statistics...");
+        runMultipleGames(strategicBot, randomBot, 1000);
     }
 
     private static void runMultipleGames(Connect4Bot bot1, Connect4Bot bot2, int numGames) {

@@ -14,33 +14,19 @@ public class BotDiscovery {
 
     private static final String IMPLEMENTATIONS_PACKAGE = "implementations";
 
-    private static final String[] KNOWN_BOT_CLASSES = {
-        "implementations.RandomConnect4Bot",
-        "implementations.SimpleStrategicBot",
-        "implementations.DefensiveBot",
-        "implementations.AggressiveBot"
-    };
-
     /**
-     * Discovers all available Connect4Bot implementations.
-     * Uses dynamic discovery first, then falls back to known bot classes.
+     * Discovers all available Connect4Bot implementations using dynamic discovery.
      */
     public static List<Connect4Bot> discoverAllBots() {
         System.out.println("🔍 Discovering bots in '" + IMPLEMENTATIONS_PACKAGE + "' package...");
 
         List<Connect4Bot> bots = new ArrayList<>();
 
-        // Try dynamic discovery first
+        // Try dynamic discovery
         try {
             bots.addAll(dynamicDiscovery());
         } catch (Exception e) {
-            System.out.println("ℹ️  Dynamic discovery not available: " + e.getMessage());
-        }
-
-        // If dynamic discovery found nothing, use fallback
-        if (bots.isEmpty()) {
-            System.out.println("🔄 Using fallback bot loading...");
-            bots.addAll(fallbackDiscovery());
+            System.out.println("ℹ️  Dynamic discovery failed: " + e.getMessage());
         }
 
         // Remove any duplicates based on bot name
@@ -82,23 +68,6 @@ public class BotDiscovery {
                         }
                     }
                 }
-            }
-        }
-
-        return bots;
-    }
-
-    /**
-     * Fallback method to load known bot implementations.
-     */
-    private static List<Connect4Bot> fallbackDiscovery() {
-        List<Connect4Bot> bots = new ArrayList<>();
-
-        for (String className : KNOWN_BOT_CLASSES) {
-            Connect4Bot bot = loadBotClass(className);
-            if (bot != null) {
-                bots.add(bot);
-                System.out.println("  ✅ Fallback loaded: " + bot.getBotName());
             }
         }
 
